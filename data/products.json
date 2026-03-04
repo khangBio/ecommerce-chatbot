@@ -1,0 +1,47 @@
+[
+  {
+    "id": "PRD001",
+    "name": "iPhone 15 Pro Max",
+    "category": "Điện thoại",
+    "price": 29990000,
+    "description": "Smartphone cao cấp với chip A17 Pro, camera 48MP, màn hình Super Retina XDR",
+    "rating": 4.8,
+    "stock": 50
+  },
+  {
+    "id": "PRD002",
+    "name": "Samsung Galaxy S24 Ultra",
+    "category": "Điện thoại",
+    "price": 27990000,
+    "description": "Flagship Android với bút S Pen, camera 200MP, chip Snapdragon 8 Gen 3",
+    "rating": 4.7,
+    "stock": 40
+  },
+  {
+    "id": "PRD003",
+    "name": "MacBook Air M3",
+    "category": "Laptop",
+    "price": 28990000,
+    "description": "Laptop mỏng nhẹ với chip M3, pin 18 giờ, màn hình Liquid Retina",
+    "rating": 4.9,
+    "stock": 30
+  },
+  {
+    "id": "PRD004",
+    "name": "AirPods Pro 2",
+    "category": "Tai nghe",
+    "price": 5990000,
+    "description": "Tai nghe chống ồn chủ động, âm thanh không gian, chuẩn MagSafe",
+    "rating": 4.6,
+    "stock": 100
+  },
+  {
+    "id": "PRD005",
+    "name": "iPad Pro 12.9 inch M2",
+    "category": "Máy tính bảng",
+    "price": 32990000,
+    "description": "Máy tính bảng cao cấp với màn hình Liquid Retina XDR, chip M2",
+    "rating": 4.8,
+    "stock": 25
+  }
+]
