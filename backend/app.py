@@ -10,6 +10,19 @@ from rag_engine import RAGEngine
 from recommendation import RecommendationEngine
 from conversation_search import ConversationalSearch
 from order_management import OrderManager
+#CORS
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+# CẤU HÌNH CORS
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Cho phép mọi domain gọi API. Khi chạy thực tế có thể thay bằng domain Vercel của bạn
+    allow_credentials=True,
+    allow_methods=["*"],  # Cho phép GET, POST, PUT, DELETE...
+    allow_headers=["*"],
+)
 
 load_dotenv()
 
