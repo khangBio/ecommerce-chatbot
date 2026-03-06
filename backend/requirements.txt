@@ -9,7 +9,7 @@ langchain-core==0.1.23
 langchain-community==0.0.20
 langchain-text-splitters==0.0.1
 sentence-transformers==2.2.2
-faiss-cpu==1.7.4
+faiss-cpu==1.13.2
 
 # Bắt buộc cài pytorch bản cpu để giảm dung lượng
 --extra-index-url https://download.pytorch.org/whl/cpu
