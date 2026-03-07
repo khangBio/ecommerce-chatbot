@@ -40,7 +40,7 @@ class RAGEngine:
         # Load embeddings
         print("Loading embeddings...")
         self.embeddings = GoogleGenerativeAIEmbeddings(
-            model="models/embedding-001",
+            model="models/text-embedding-004",
             google_api_key=os.getenv("GEMINI_API_KEY")
         )
         

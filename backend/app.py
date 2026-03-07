@@ -38,9 +38,21 @@ app.add_middleware(
 )
 
 # Initialize engines
-rag_engine = RAGEngine()
+conversation_search = None
+rag_engine = None
+try:
+    rag_engine = RAGEngine()
+    print("✅ RAGEngine loaded")
+except Exception as e:
+    print(f"⚠️ RAGEngine failed: {e}")
+
+try:
+    conversation_search = ConversationalSearch()
+    print("✅ ConversationalSearch loaded")
+except Exception as e:
+    print(f"⚠️ ConversationalSearch failed: {e}")
+
 recommendation_engine = RecommendationEngine()
-conversation_search = ConversationalSearch()
 order_manager = OrderManager()
 
 # Request/Response models
