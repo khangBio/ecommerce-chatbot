@@ -1,16 +1,23 @@
+# Web Framework
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
 pydantic==2.5.3
 python-dotenv==1.0.0
 python-multipart==0.0.9
-numpy==1.26.4
+
+# Google Gemini
 google-generativeai>=0.3.0
+
+# LangChain
 langchain-core==0.1.23
 langchain-community==0.0.20
 langchain-text-splitters==0.0.1
-sentence-transformers==2.2.2
-faiss-cpu==1.13.2
 
-# Bắt buộc cài pytorch bản cpu để giảm dung lượng
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.2.0+cpu
+# Embeddings - Google (KHÔNG cần torch, không cần sentence-transformers)
+langchain-google-genai>=0.0.6
+
+# Vector store
+faiss-cpu
+
+# Numpy
+numpy

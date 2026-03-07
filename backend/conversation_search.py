@@ -1,7 +1,8 @@
 # backend/conversation_search.py - GEMINI VERSION
 
 from langchain_community.vectorstores import FAISS  # Thay Chroma bằng FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings  # Embeddings miễn phí
+#from langchain_community.embeddings import HuggingFaceEmbeddings  # Embeddings miễn phí
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import json
 import uuid
 import os
@@ -17,9 +18,9 @@ class ConversationalSearch:
     def __init__(self):
         # Sử dụng HuggingFace Embeddings (miễn phí, chạy local)
         print("🔄 Loading embeddings model for product search...")
-        self.embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-            model_kwargs={'device': 'cpu'}  # Chạy trên CPU
+        self.embeddings = GoogleGenerativeAIEmbeddings(
+            model="models/embedding-001",
+            google_api_key=os.getenv("GEMINI_API_KEY")
         )
         
         self.product_vectorstore = None
