@@ -76,7 +76,12 @@ class ProductSearchRequest(BaseModel):
 class OrderRequest(BaseModel):
     order_id: str
     user_id: str
-
+    
+#health check
+@app.get("/")
+def health_check():
+    return {"status": "ok", "message": "Ecommerce Chatbot API is running!"}
+    
 # Main chat endpoint
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
