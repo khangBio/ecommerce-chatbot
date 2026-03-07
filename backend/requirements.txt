@@ -1,23 +1,22 @@
-# Web Framework
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-pydantic==2.5.3
-python-dotenv==1.0.0
-python-multipart==0.0.9
+# ===== Web Framework =====
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.7.0
+python-dotenv>=1.0.0
+python-multipart>=0.0.9
 
-# Google Gemini
-google-generativeai>=0.3.0
+# ===== Google Gemini =====
+google-generativeai>=0.5.0
+langchain-google-genai>=1.0.0
 
-# LangChain
-langchain-core==0.1.23
-langchain-community==0.0.20
-langchain-text-splitters==0.0.1
+# ===== LangChain (phiên bản tương thích Python 3.11) =====
+langchain>=0.1.20
+langchain-core>=0.1.52
+langchain-community>=0.0.38
+langchain-text-splitters>=0.0.1
 
-# Embeddings - Google (KHÔNG cần torch, không cần sentence-transformers)
-langchain-google-genai>=0.0.6
+# ===== Vector Store =====
+faiss-cpu>=1.8.0
 
-# Vector store
-faiss-cpu
-
-# Numpy
-numpy
+# ===== Numpy =====
+numpy>=1.26.0
