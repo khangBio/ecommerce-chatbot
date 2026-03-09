@@ -43,5 +43,140 @@
     "description": "Máy tính bảng cao cấp với màn hình Liquid Retina XDR, chip M2",
     "rating": 4.8,
     "stock": 25
+  },
+  {
+    "id": "PRD006",
+    "name": "iPhone 15 128GB",
+    "category": "Điện thoại",
+    "price": 22990000,
+    "description": "Thiết kế mới với Dynamic Island, camera chính 48MP sắc nét, cổng sạc Type-C tiện lợi và chip A16 Bionic tối ưu.",
+    "rating": 4.8,
+    "stock": 80
+  },
+  {
+    "id": "PRD007",
+    "name": "Samsung Galaxy Z Fold5",
+    "category": "Điện thoại",
+    "price": 40990000,
+    "description": "Điện thoại gập cao cấp nhất của Samsung, bản lề Flex mỏng nhẹ, màn hình khổng lồ 7.6 inch, chip Snapdragon 8 Gen 2 for Galaxy.",
+    "rating": 4.9,
+    "stock": 15
+  },
+  {
+    "id": "PRD008",
+    "name": "Xiaomi 14 5G",
+    "category": "Điện thoại",
+    "price": 22990000,
+    "description": "Flagship nhỏ gọn với cụm camera hợp tác cùng Leica, trang bị vi xử lý Snapdragon 8 Gen 3 siêu mạnh và sạc nhanh 90W.",
+    "rating": 4.6,
+    "stock": 35
+  },
+  {
+    "id": "PRD009",
+    "name": "OPPO Find N3 Flip",
+    "category": "Điện thoại",
+    "price": 22990000,
+    "description": "Điện thoại gập dạng vỏ sò thời trang, nếp gấp tàng hình, màn hình phụ dọc đa dụng và cụm 3 camera Hasselblad đỉnh cao.",
+    "rating": 4.5,
+    "stock": 20
+  },
+  {
+    "id": "PRD010",
+    "name": "Dell XPS 15 9530",
+    "category": "Laptop",
+    "price": 45990000,
+    "description": "Laptop doanh nhân cao cấp với thiết kế nhôm nguyên khối, màn hình OLED 3.5K tuyệt đẹp và card đồ họa RTX 4050.",
+    "rating": 4.8,
+    "stock": 12
+  },
+  {
+    "id": "PRD011",
+    "name": "Lenovo ThinkPad X1 Carbon Gen 11",
+    "category": "Laptop",
+    "price": 42990000,
+    "description": "Laptop mỏng nhẹ siêu bền bỉ chuẩn quân đội, bàn phím gõ tốt nhất thế giới, bảo mật vân tay và khuôn mặt tiên tiến.",
+    "rating": 4.9,
+    "stock": 8
+  },
+  {
+    "id": "PRD012",
+    "name": "ASUS ROG Strix G16",
+    "category": "Laptop",
+    "price": 35990000,
+    "description": "Laptop gaming chiến mượt mọi game AAA với chip Intel Core i7 Gen 13, RTX 4060, màn hình 165Hz và hệ thống tản nhiệt thông minh.",
+    "rating": 4.7,
+    "stock": 22
+  },
+  {
+    "id": "PRD013",
+    "name": "Apple AirPods 3",
+    "category": "Tai nghe",
+    "price": 4290000,
+    "description": "Tai nghe không dây thiết kế mới gọn nhẹ hơn, hỗ trợ âm thanh không gian Spatial Audio và thời lượng pin cực trâu.",
+    "rating": 4.6,
+    "stock": 150
+  },
+  {
+    "id": "PRD014",
+    "name": "Sony WF-1000XM5",
+    "category": "Tai nghe",
+    "price": 6990000,
+    "description": "Tai nghe True Wireless chống ồn chủ động tốt nhất hiện nay, hỗ trợ nghe nhạc Hi-Res Audio không dây, thiết kế nhỏ gọn ôm tai.",
+    "rating": 4.8,
+    "stock": 45
+  },
+  {
+    "id": "PRD015",
+    "name": "Marshall Motif II A.N.C",
+    "category": "Tai nghe",
+    "price": 4990000,
+    "description": "Tai nghe bluetooth sở hữu thiết kế giả da bọc bọc lớp nhựa cứng cổ điển, âm thanh đặc trưng mạnh mẽ của Marshall và chống ồn chủ động.",
+    "rating": 4.7,
+    "stock": 60
+  },
+  {
+    "id": "PRD016",
+    "name": "iPad Air 5 M1",
+    "category": "Máy tính bảng",
+    "price": 14990000,
+    "description": "Máy tính bảng hiệu năng vượt trội với chip Apple M1, thiết kế viền mỏng nhiều màu sắc, hỗ trợ kết nối Apple Pencil 2.",
+    "rating": 4.8,
+    "stock": 55
+  },
+  {
+    "id": "PRD017",
+    "name": "Samsung Galaxy Tab S9 Ultra",
+    "category": "Máy tính bảng",
+    "price": 32990000,
+    "description": "Chiếc tablet khổng lồ với màn hình 14.6 inch Dynamic AMOLED 2X, kháng nước IP68 đầu tiên và tặng kèm bút S Pen siêu nhạy.",
+    "rating": 4.9,
+    "stock": 18
+  },
+  {
+    "id": "PRD018",
+    "name": "Xiaomi Pad 6",
+    "category": "Máy tính bảng",
+    "price": 8990000,
+    "description": "Máy tính bảng Android quốc dân trong tầm giá, màn hình 11 inch 144Hz siêu mượt, chip Snapdragon 870 và pin dung lượng lớn 8840mAh.",
+    "rating": 4.7,
+    "stock": 90
+  },
+  {
+    "id": "PRD019",
+    "name": "Apple Watch Series 9",
+    "category": "Đồng hồ thông minh",
+    "price": 10490000,
+    "description": "Đồng hồ thông minh cao cấp với tính năng Double Tap chạm hai lần độc đáo, màn hình sáng gấp đôi và theo dõi sức khỏe chuyên sâu.",
+    "rating": 4.8,
+    "stock": 40
+  },
+  {
+    "id": "PRD020",
+    "name": "Samsung Galaxy Watch 6 Classic",
+    "category": "Đồng hồ thông minh",
+    "price": 8990000,
+    "description": "Smartwatch mang thiết kế mặt số xoay vật lý huyền thoại, viền thép không gỉ sang trọng và đo huyết áp, điện tâm đồ ECG.",
+    "rating": 4.7,
+    "stock": 35
   }
 ]

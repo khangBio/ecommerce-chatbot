@@ -577,6 +577,35 @@
       animation: slideIn 0.3s ease;
     }
 
+    /* ===== THANH TÌM KIẾM LỊCH SỬ ===== */
+    .chat-search-bar {
+      padding: 10px 16px;
+      background: #f8f9ff;
+      border-bottom: 1px solid #e8eaf6;
+      display: none; /* Mặc định ẩn, điều khiển bằng JS */
+      animation: slideDown 0.2s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-search-bar input {
+      width: 100%;
+      padding: 8px 14px;
+      border: 1px solid #c5cae9;
+      border-radius: 20px;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .chat-search-bar input:focus {
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 3px rgba(26,115,232,0.1);
+    }
+
     @keyframes slideIn {
       from { transform: translateX(120%); opacity: 0; }
       to   { transform: translateX(0);   opacity: 1; }
@@ -584,16 +613,43 @@
 
     .toast-title { font-weight: 600; font-size: 14px; color: #1a1a2e; margin-bottom: 4px; }
     .toast-body  { font-size: 13px; color: #666; }
+
+    /* ===== MODAL ĐƠN HÀNG ===== */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none; justify-content: center; align-items: center;
+      z-index: 2000;
+    }
+    .modal-content {
+      background: white; width: 90%; max-width: 500px;
+      border-radius: 12px; padding: 20px;
+      max-height: 80vh; overflow-y: auto;
+    }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;
+    }
+    .close-btn { cursor: pointer; font-size: 24px; color: #666; line-height: 1; }
+    .close-btn:hover { color: #ea4335; }
+    .history-order-card {
+      border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 15px; margin-bottom: 15px; background: #fafbff;
+    }
+    .history-order-header {
+      display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600;
+    }
+    .history-order-body p { font-size: 13px; color: #555; margin-bottom: 5px; }
   </style>
 </head>
 <body>
 
 <!-- Navbar -->
 <nav class="navbar">
-  <div class="navbar-brand">🛒 Shop<span>G1</span></div>
-  <div style="display:flex; gap:20px; font-size:14px; color:#555;">
+  <div class="navbar-brand">🛒 Shop<span>Bot</span></div>
+  <div style="display:flex; gap:20px; font-size:14px; color:#555; cursor: pointer;">
     <span>🏠 Trang chủ</span>
-    <span>📦 Đơn hàng</span>
+    <span onclick="openOrderModal()">📦 Đơn hàng</span>
     <span>❤️ Yêu thích</span>
     <span>👤 Tài khoản</span>
   </div>
@@ -619,6 +675,11 @@
     <div class="section-title">🔥 Sản phẩm nổi bật</div>
     <div class="product-grid" id="productGrid">
       <!-- Rendered by JS -->
+    </div>
+    <div style="text-align: center; margin-top: 15px;">
+      <button id="loadMoreBtn" onclick="loadMore()" style="display: none; padding: 8px 20px; background: white; border: 1px solid #1a73e8; color: #1a73e8; border-radius: 20px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
+        Xem thêm sản phẩm
+      </button>
     </div>
 
     <div class="quick-actions" style="margin-top:20px">
@@ -660,16 +721,20 @@
       <div class="chat-header">
         <div class="bot-avatar">🤖</div>
         <div class="bot-info">
-          <h3>BotG1 AI</h3>
+          <h3>ShopBot AI</h3>
           <div class="bot-status">
             <div class="status-dot"></div>
             Đang hoạt động
           </div>
         </div>
         <div class="chat-actions">
+          <button class="chat-action-btn" onclick="toggleSearch()" title="Tìm kiếm lịch sử">🔍</button>
           <button class="chat-action-btn" onclick="clearChat()" title="Cuộc trò chuyện mới">🗑️</button>
           <button class="chat-action-btn" onclick="toggleMinimize()" title="Thu nhỏ">➖</button>
         </div>
+      </div>
+      <div class="chat-search-bar" id="chatSearchBar" style="display: none;">
+        <input type="text" id="historySearchInput" placeholder="🔍 Gõ để tìm trong đoạn chat..." onkeyup="filterChatHistory()">
       </div>
 
       <!-- Suggestion chips -->
@@ -717,13 +782,32 @@
   <div class="toast-body"  id="toastBody"></div>
 </div>
 
+<div class="modal-overlay" id="orderModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>📦 Lịch sử Đơn hàng</h2>
+      <span class="close-btn" onclick="closeOrderModal()">&times;</span>
+    </div>
+    <div id="orderListContent">
+      </div>
+  </div>
+</div>
+
 
 <script>
   // ===== CONFIG =====
-  const API_BASE = 'https://ecommerce-chatbot-kmt1.onrender.com'; //'http://localhost:8000';
+  // const API_BASE = 'https://ecommerce-chatbot-kmt1.onrender.com'; //'http://localhost:8000';
+  const API_BASE = 'http://localhost:8000';
   let conversationId = null;
-  let userId = 'user_' + Math.random().toString(36).substr(2, 9);
   let isTyping = false;
+  let userId = localStorage.getItem('shopbot_user_id');
+  // THÊM 2 BIẾN NÀY ĐỂ QUẢN LÝ SẢN PHẨM
+  let allProducts = [];
+  let currentLimit = 6; // Số lượng hiển thị ban đầu
+  if (!userId) {
+    userId = 'user_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('shopbot_user_id', userId);
+  }
 
   // ===== SAMPLE PRODUCTS =====
   const sampleProducts = [
@@ -742,17 +826,62 @@
   ];
 
   // ===== RENDER PRODUCTS =====
-  function renderProducts() {
+  // function renderProducts() {
+  //   const grid = document.getElementById('productGrid');
+  //   grid.innerHTML = sampleProducts.map(p => `
+  //     <div class="product-card" onclick="askAboutProduct('${p.name}')">
+  //       <div class="product-emoji">${p.emoji}</div>
+  //       <span class="product-category">${p.category}</span>
+  //       <div class="product-name">${p.name}</div>
+  //       <div class="product-price">${p.price.toLocaleString('vi-VN')}đ</div>
+  //       <div class="product-rating">${p.rating}</div>
+  //     </div>
+  //   `).join('');
+  // }
+  async function renderProducts() {
     const grid = document.getElementById('productGrid');
-    grid.innerHTML = sampleProducts.map(p => `
+    grid.innerHTML = '<div style="text-align:center; padding:20px; grid-column: span 2;">⏳ Đang tải...</div>';
+    
+    // Lấy toàn bộ dữ liệu 1 lần
+    allProducts = await fetchFeaturedProducts();
+    updateProductUI();
+  }
+
+  function updateProductUI() {
+    const grid = document.getElementById('productGrid');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    
+    if (allProducts.length === 0) {
+      grid.innerHTML = '<div style="text-align:center; padding:20px; color:#666; grid-column: span 2;">Không có sản phẩm nào</div>';
+      loadMoreBtn.style.display = 'none';
+      return;
+    }
+    
+    // Chỉ cắt ra số lượng bằng với currentLimit để hiển thị
+    const productsToShow = allProducts.slice(0, currentLimit);
+    
+    grid.innerHTML = productsToShow.map(p => `
       <div class="product-card" onclick="askAboutProduct('${p.name}')">
-        <div class="product-emoji">${p.emoji}</div>
-        <span class="product-category">${p.category}</span>
+        <div class="product-emoji">${p.emoji || '📦'}</div>
+        <span class="product-category">${p.category || 'Sản phẩm'}</span>
         <div class="product-name">${p.name}</div>
-        <div class="product-price">${p.price.toLocaleString('vi-VN')}đ</div>
-        <div class="product-rating">${p.rating}</div>
+        <div class="product-price">${Number(p.price || 0).toLocaleString('vi-VN')}đ</div>
+        <div class="product-rating">${'⭐'.repeat(Math.floor(p.rating || 4))}</div>
       </div>
     `).join('');
+    
+    // Nếu vẫn còn sản phẩm chưa hiện, bật nút Xem thêm
+    if (currentLimit < allProducts.length) {
+      loadMoreBtn.style.display = 'inline-block';
+    } else {
+      loadMoreBtn.style.display = 'none'; // Đã hiện hết thì giấu nút
+    }
+  }
+
+  // Hàm được gọi khi user bấm nút "Xem thêm"
+  function loadMore() {
+    currentLimit += 6; // Tăng thêm 6 sản phẩm mỗi lần bấm
+    updateProductUI();
   }
 
   // ===== CHAT UTILS =====
@@ -992,7 +1121,7 @@
     const data = await callChatAPI(text);
     removeTyping();
     conversationId = data.conversation_id || conversationId;
-    appendMessage(data.response || data.message || data.bot_message || 'Tôi có thể giúp gì cho bạn?', 'bot');
+    appendMessage(data.response || data.message || 'Tôi có thể giúp gì cho bạn?', 'bot');
   }
 
   async function handleSearch(text) {
@@ -1113,9 +1242,158 @@
     );
   }
 
+  // Thêm function fetch products
+  async function fetchFeaturedProducts() {
+    try {
+      // Gọi API lấy tối đa 50 sản phẩm về máy để dành
+      const response = await fetch(`${API_BASE}/products/featured?limit=50`);
+      if (!response.ok) throw new Error('API error');
+      const data = await response.json();
+      return data.products || [];
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return []; 
+    }
+  }
+
+  // ===== TẢI LỊCH SỬ CHAT TỪ MONGODB =====
+  async function loadChatHistory() {
+    try {
+      const res = await fetch(`${API_BASE}/chat/history/${userId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      
+      const history = data.history || [];
+      if (history.length > 0) {
+        // Xóa khung chat rỗng ban đầu đi
+        document.getElementById('chatMessages').innerHTML = '';
+        
+        // Vẽ lại từng lượt hỏi đáp
+        history.forEach(chat => {
+          appendMessage(chat.user_message, 'user');
+          appendMessage(chat.bot_response, 'bot');
+        });
+      } else {
+        // Nếu là user mới tinh, hiển thị lời chào mặc định
+        showWelcome();
+      }
+    } catch (err) {
+      console.error("Lỗi tải lịch sử:", err);
+      showWelcome();
+    }
+  }
+
   // ===== INIT =====
   renderProducts();
   showWelcome();
+  async function init() {
+    await renderProducts(); // Chờ load products
+    await loadChatHistory();
+    // showWelcome();
+  }
+
+  // ===== QUẢN LÝ LỊCH SỬ ĐƠN HÀNG =====
+  async function fetchUserOrders() {
+    try {
+      const res = await fetch(`${API_BASE}/orders/user/${userId}`);
+      if (!res.ok) throw new Error('Failed to fetch');
+      const data = await res.json();
+      return data.orders || [];
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  }
+
+  async function openOrderModal() {
+    document.getElementById('orderModal').style.display = 'flex';
+    const contentEl = document.getElementById('orderListContent');
+    contentEl.innerHTML = '<p style="text-align: center; color: #666;">⏳ Đang tải dữ liệu từ máy chủ...</p>';
+
+    const orders = await fetchUserOrders();
+
+    if (orders.length === 0) {
+      contentEl.innerHTML = '<p style="text-align: center; color: #666; padding: 20px 0;">Bạn chưa có đơn hàng nào.</p>';
+      return;
+    }
+
+    contentEl.innerHTML = orders.map(o => {
+      // Dùng lại class CSS status đã có sẵn trong source của bạn
+      const statusClass = {
+        pending:'status-pending', shipping:'status-shipping', delivered:'status-delivered'
+      }[o.status] || 'status-pending';
+
+      const statusLabel = {
+        pending:'⏳ Chờ xác nhận', shipping:'🚚 Đang giao hàng', delivered:'✅ Đã giao hàng'
+      }[o.status] || o.status;
+      
+      // Định dạng ngày giờ
+      const orderDate = new Date(o.created_at).toLocaleString('vi-VN');
+
+      return `
+        <div class="history-order-card">
+          <div class="history-order-header">
+            <span style="color:#1a73e8">#${o.order_id}</span>
+            <span class="status-badge ${statusClass}">${statusLabel}</span>
+          </div>
+          <div class="history-order-body">
+            <p>📅 Ngày đặt: <b>${orderDate}</b></p>
+            <p>💰 Tổng tiền: <b>${Number(o.total || 0).toLocaleString('vi-VN')}đ</b></p>
+            <p>🏷️ Mã vận đơn: <b>${o.tracking_number || 'Chưa có'}</b></p>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function closeOrderModal() {
+    document.getElementById('orderModal').style.display = 'none';
+  }
+
+  // ===== TÌM KIẾM LỊCH SỬ CHAT =====
+  
+  // Bật tắt thanh tìm kiếm
+  function toggleSearch() {
+    const searchBar = document.getElementById('chatSearchBar');
+    const searchInput = document.getElementById('historySearchInput');
+    
+    if (searchBar.style.display === 'none' || searchBar.style.display === '') {
+      searchBar.style.display = 'block';
+      searchInput.focus(); // Tự động trỏ nháy chuột vào ô nhập
+    } else {
+      searchBar.style.display = 'none';
+      searchInput.value = ''; // Xóa chữ đi
+      filterChatHistory(); // Trả lại toàn bộ tin nhắn
+      scrollToBottom();
+    }
+  }
+
+  // Lọc tin nhắn realtime
+  function filterChatHistory() {
+    const keyword = document.getElementById('historySearchInput').value.toLowerCase();
+    const messages = document.querySelectorAll('.chat-messages .message');
+    
+    messages.forEach(msg => {
+      // Lấy toàn bộ chữ trong bong bóng chat (bao gồm cả mô tả sản phẩm nếu có)
+      const text = msg.innerText.toLowerCase();
+      
+      if (text.includes(keyword)) {
+        msg.style.display = 'flex'; // Hiện nếu có từ khóa
+      } else {
+        msg.style.display = 'none'; // Ẩn nếu không khớp
+      }
+    });
+  }
+
+  // Bấm ra ngoài vùng tối để đóng modal
+  window.addEventListener('click', function(event) {
+    const modal = document.getElementById('orderModal');
+    if (event.target == modal) {
+      closeOrderModal();
+    }
+  });
+
+  init();
 </script>
 
 </body>

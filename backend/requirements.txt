@@ -18,5 +18,11 @@ langchain-text-splitters>=0.0.1
 # ===== Vector Store =====
 faiss-cpu>=1.8.0
 
+# ===== MongoDB =====
+pymongo>=4.6.0
+
+# ===== Image Processing =====
+Pillow>=10.0.0
+
 # ===== Numpy =====
 numpy>=1.26.0

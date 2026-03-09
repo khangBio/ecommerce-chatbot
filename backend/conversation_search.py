@@ -1,118 +1,56 @@
 # backend/conversation_search.py - GEMINI VERSION
 
 from langchain_community.vectorstores import FAISS  # Thay Chroma bằng FAISS
-#from langchain_community.embeddings import HuggingFaceEmbeddings  # Embeddings miễn phí
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import json
 import uuid
 import os
 from datetime import datetime
+from models.product import ProductModel  # Import ProductModel từ MongoDB
 
 class ConversationalSearch:
     """
     Tìm kiếm hội thoại - Conversational Search
     Tìm kiếm sản phẩm bằng ngôn ngữ tự nhiên với ngữ cảnh
-    VERSION: Gemini + FAISS (MIỄN PHÍ)
+    VERSION: Gemini + FAISS + MongoDB
     """
-    
+
     def __init__(self):
-        # Sử dụng HuggingFace Embeddings (miễn phí, chạy local)
+        # Sử dụng Google Generative AI Embeddings
         print("🔄 Loading embeddings model for product search...")
         self.embeddings = GoogleGenerativeAIEmbeddings(
             model="models/gemini-embedding-001",
             google_api_key=os.getenv("GEMINI_API_KEY")
         )
-        
+
         self.product_vectorstore = None
         self.conversations = {}
-        
-        # Load product catalog
-        self._load_products()
+
+        # Khởi tạo ProductModel
+        self.product_model = ProductModel()
+        if self.product_model.connect():
+            print("✅ Connected to MongoDB for products")
+        else:
+            print("❌ Failed to connect to MongoDB")
+
+        # Load product catalog từ MongoDB
+        self._load_products_from_db()
     
-    def _load_products(self):
-        """Load và vectorize product catalog"""
-        # Đường dẫn linh hoạt
-        products_path = os.path.join(os.path.dirname(__file__), "..", "data", "products.json")
-        
+    def _load_products_from_db(self):
+        """Load và vectorize product catalog từ MongoDB"""
         try:
-            with open(products_path, "r", encoding="utf-8") as f:
-                products = json.load(f)
-        except FileNotFoundError:
-            print("⚠️ File products.json không tồn tại. Đang tạo dữ liệu mẫu...")
+            # Lấy tất cả sản phẩm từ MongoDB
+            products = self.product_model.get_all_products(limit=1000)
             
-            # Tạo sample products
-            products = [
-                {
-                    "id": "PRD001",
-                    "name": "iPhone 15 Pro Max",
-                    "category": "Điện thoại",
-                    "price": 29990000,
-                    "description": "Smartphone cao cấp với chip A17 Pro, camera 48MP, màn hình Super Retina XDR",
-                    "rating": 4.8,
-                    "stock": 50
-                },
-                {
-                    "id": "PRD002",
-                    "name": "Samsung Galaxy S24 Ultra",
-                    "category": "Điện thoại",
-                    "price": 27990000,
-                    "description": "Flagship Android với bút S Pen, camera 200MP, chip Snapdragon 8 Gen 3",
-                    "rating": 4.7,
-                    "stock": 40
-                },
-                {
-                    "id": "PRD003",
-                    "name": "MacBook Air M3",
-                    "category": "Laptop",
-                    "price": 28990000,
-                    "description": "Laptop mỏng nhẹ với chip M3, pin 18 giờ, màn hình Liquid Retina",
-                    "rating": 4.9,
-                    "stock": 30
-                },
-                {
-                    "id": "PRD004",
-                    "name": "AirPods Pro 2",
-                    "category": "Tai nghe",
-                    "price": 5990000,
-                    "description": "Tai nghe chống ồn chủ động, âm thanh không gian, chuẩn MagSafe",
-                    "rating": 4.6,
-                    "stock": 100
-                },
-                {
-                    "id": "PRD005",
-                    "name": "iPad Pro 12.9 inch M2",
-                    "category": "Máy tính bảng",
-                    "price": 32990000,
-                    "description": "Máy tính bảng cao cấp với màn hình Liquid Retina XDR, chip M2",
-                    "rating": 4.8,
-                    "stock": 25
-                },
-                {
-                    "id": "PRD006",
-                    "name": "Dell XPS 15",
-                    "category": "Laptop",
-                    "price": 35990000,
-                    "description": "Laptop cao cấp Intel Core i7, RAM 16GB, màn hình 4K OLED",
-                    "rating": 4.7,
-                    "stock": 20
-                },
-                {
-                    "id": "PRD007",
-                    "name": "Sony WH-1000XM5",
-                    "category": "Tai nghe",
-                    "price": 8990000,
-                    "description": "Tai nghe over-ear chống ồn hàng đầu, âm thanh Hi-Res",
-                    "rating": 4.9,
-                    "stock": 60
-                }
-            ]
+            if not products:
+                print("⚠️ Không có sản phẩm trong MongoDB. Chạy database_setup.py trước!")
+                return
             
-            # Tạo thư mục và lưu file
-            os.makedirs(os.path.dirname(products_path), exist_ok=True)
-            with open(products_path, "w", encoding="utf-8") as f:
-                json.dump(products, f, ensure_ascii=False, indent=2)
+            print(f"📦 Đã load {len(products)} sản phẩm từ MongoDB")
             
-            print(f"✅ Đã tạo file: {products_path}")
+        except Exception as e:
+            print(f"❌ Lỗi khi load products từ MongoDB: {e}")
+            return
         
         # Create product descriptions for embedding
         product_texts = []
@@ -124,8 +62,7 @@ class ConversationalSearch:
             product_texts.append(text)
             product_metadata.append(product)
         
-        # Create FAISS vector store (thay Chroma)
-        # FAISS nhẹ hơn, không cần persist_directory
+        # Create FAISS vector store
         print("🔄 Creating product vector store...")
         self.product_vectorstore = FAISS.from_texts(
             texts=product_texts,
@@ -133,32 +70,51 @@ class ConversationalSearch:
             metadatas=product_metadata
         )
         
-        print(f"✅ Đã load {len(products)} sản phẩm vào vector store")
+        print(f"✅ Đã tạo vector store với {len(products)} sản phẩm")
     
     def search(self, query: str, filters: dict = None, conversation_id: str = None) -> dict:
         """
-        Tìm kiếm sản phẩm với context retention
+        Tìm kiếm sản phẩm với context retention và MongoDB validation
         """
         # Get conversation context
         context = self.get_context(conversation_id) if conversation_id else {}
-        
-        # Enhance query with context
         enhanced_query = self._enhance_query(query, context)
         
-        # Apply filters from previous conversation
         if context.get("filters"):
             filters = {**context.get("filters", {}), **(filters or {})}
         
-        # Semantic search với FAISS
-        results = self.product_vectorstore.similarity_search(
+        # Sử dụng similarity_search_with_score để lấy cả điểm số khoảng cách
+        results_with_scores = self.product_vectorstore.similarity_search_with_score(
             enhanced_query,
-            k=5  # Lấy top 5 sản phẩm
+            k=5
         )
         
-        # Filter results
+        # Các từ khóa thương hiệu cần lọc cứng (có thể mở rộng thêm)
+        query_words = query.lower().split()
+        brand_keywords = ["samsung", "apple", "iphone", "macbook", "sony", "ipad"]
+        brands_in_query = [b for b in brand_keywords if b in query_words]
+        
         products = []
-        for doc in results:
+        DISTANCE_THRESHOLD = 0.85 # Ngưỡng điểm an toàn để loại bỏ kết quả rác
+        
+        for doc, score in results_with_scores:
+            # 1. Bỏ qua nếu khoảng cách ngữ nghĩa quá xa
+            if score > DISTANCE_THRESHOLD:
+                continue 
+                
             product = doc.metadata
+            
+            # 2. Bộ lọc cứng: Nếu user gọi tên hãng (vd: samsung) mà sản phẩm không có chữ đó -> Bỏ qua
+            skip_product = False
+            for brand in brands_in_query:
+                if brand not in product["name"].lower() and brand not in product.get("description", "").lower():
+                    skip_product = True
+                    break
+            
+            if skip_product:
+                continue
+
+            # 3. Áp dụng các filter động từ context (giá, category)
             if self._apply_filters(product, filters):
                 products.append(product)
         

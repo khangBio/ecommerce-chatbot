@@ -13,6 +13,8 @@ from order_management import OrderManager
 #CORS
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from models.product import ProductModel
+from models.conversation import ConversationModel
 
 # CẤU HÌNH CORS
 app = FastAPI()
@@ -54,6 +56,8 @@ except Exception as e:
 
 recommendation_engine = RecommendationEngine()
 order_manager = OrderManager()
+conversation_model = ConversationModel()
+conversation_model.connect()
 
 # Request/Response models
 class ChatRequest(BaseModel):
@@ -161,6 +165,13 @@ async def chat(request: ChatRequest):
             bot_message=bot_message,
             intent=intent
         )
+
+        conversation_model.save_interaction(
+            user_id=request.user_id,
+            user_message=request.message,
+            bot_response=bot_message,
+            intent=intent
+        )
         
         return ChatResponse(
             bot_message=bot_message,
@@ -207,10 +218,38 @@ async def create_order(order_data: dict):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/orders/user/{user_id}")
+async def get_user_orders(user_id: str):
+    """Lấy danh sách đơn hàng theo user_id"""
+    try:
+        orders = order_manager.get_user_orders(user_id)
+        return {"orders": orders}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
 
+@app.get("/products/featured")
+async def get_featured_products(limit: int = 6):
+    model = ProductModel()
+    if model.connect():
+        products = model.get_all_products(limit)
+        model.disconnect()
+        return {"products": products}
+    return {"products": []}
+
+@app.get("/chat/history/{user_id}")
+async def get_chat_history(user_id: str):
+    """Lấy lịch sử chat của một user"""
+    try:
+        history = conversation_model.get_history_by_user(user_id)
+        return {"history": history}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+    

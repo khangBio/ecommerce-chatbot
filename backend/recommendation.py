@@ -2,6 +2,7 @@
 import json
 from typing import List, Dict
 import random
+from models.product import ProductModel
 
 class RecommendationEngine:
     """
@@ -10,8 +11,9 @@ class RecommendationEngine:
     """
     
     def __init__(self):
-        with open("../data/products.json", "r", encoding="utf-8") as f:
-            self.products = json.load(f)
+        # KHỞI TẠO KẾT NỐI MONGODB
+        self.product_model = ProductModel()
+        self.product_model.connect()
         self.user_profiles = {}
     
     def get_recommendations(self, user_id: str, preferences: dict, 
@@ -19,6 +21,9 @@ class RecommendationEngine:
         """
         Generate product recommendations
         """
+        # Lấy danh sách sản phẩm trực tiếp từ DB
+        products = self.product_model.get_all_products(limit=100)
+
         # Extract preferences from conversation
         budget = preferences.get("budget")
         category = preferences.get("category")
@@ -26,7 +31,7 @@ class RecommendationEngine:
         
         # Filter products
         candidates = []
-        for product in self.products:
+        for product in products: 
             score = self._calculate_score(product, preferences)
             if score > 0:
                 candidates.append({**product, "score": score})
@@ -42,7 +47,7 @@ class RecommendationEngine:
         
         return {
             "products": recommendations[:5],
-            "reasoning": self._generate_reasoning(recommendations[0], preferences)
+            "reasoning": self._generate_reasoning(recommendations[0] if recommendations else {}, preferences)
         }
     
     def _calculate_score(self, product: dict, preferences: dict) -> float:
