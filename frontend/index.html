@@ -640,6 +640,157 @@
       display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600;
     }
     .history-order-body p { font-size: 13px; color: #555; margin-bottom: 5px; }
+
+     /* ===== FOOTER ===== */
+  .footer {
+    background: #1a1a2e;
+    color: #ccc;
+    margin-top: 60px;
+    padding: 48px 32px 0;
+  }
+
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 40px;
+  }
+
+  @media (max-width: 768px) {
+    .footer-content {
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .footer-content { grid-template-columns: 1fr; }
+  }
+
+  /* Brand */
+  .footer-logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 10px;
+  }
+
+  .footer-desc {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #aaa;
+    margin-bottom: 14px;
+  }
+
+  .footer-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .footer-badge {
+    background: rgba(26, 115, 232, 0.2);
+    border: 1px solid rgba(26, 115, 232, 0.4);
+    color: #90caf9;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 12px;
+  }
+
+  /* Links */
+  .footer-links h4 {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .footer-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .footer-links ul li,
+  .footer-links ul li a {
+    font-size: 13px;
+    color: #aaa;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links ul li a:hover { color: #1a73e8; }
+
+  /* Payment */
+  .payment-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pay-icon {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #ccc;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 6px;
+  }
+
+  /* Divider */
+  .footer-divider {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+  }
+
+  /* Bottom bar */
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-copyright {
+    font-size: 13px;
+    color: #888;
+  }
+
+  .footer-copyright strong { color: #fff; }
+
+  .footer-legal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #666;
+  }
+
+  .footer-legal a {
+    color: #888;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-legal a:hover { color: #1a73e8; }
+
+  .footer-made {
+    font-size: 13px;
+    color: #666;
+  }
   </style>
 </head>
 <body>
@@ -657,7 +808,7 @@
 
 <!-- Hero -->
 <div class="hero">
-  <h1>🤖 ShopG1</h1>
+  <h1>🤖 Jarvis AI</h1>
   <p>Hỏi bất cứ điều gì – Tìm sản phẩm, đặt hàng, theo dõi giao hàng</p>
   <div class="hero-badges">
     <span class="badge">⚡ Phản hồi tức thì</span>
@@ -721,7 +872,7 @@
       <div class="chat-header">
         <div class="bot-avatar">🤖</div>
         <div class="bot-info">
-          <h3>ShopG1 AI</h3>
+          <h3>Jarvis AI</h3>
           <div class="bot-status">
             <div class="status-dot"></div>
             Đang hoạt động
@@ -793,7 +944,74 @@
   </div>
 </div>
 
+<footer class="footer">
+  <div class="footer-content">
 
+    <!-- Logo & Mô tả -->
+    <div class="footer-brand">
+      <div class="footer-logo">🛒 ShopG1</div>
+      <p class="footer-desc">Nền tảng mua sắm thông minh tích hợp AI<br>Hỗ trợ khách hàng 24/7 bằng công nghệ Gemini AI</p>
+      <div class="footer-badges">
+        <span class="footer-badge">🤖 Powered by Gemini AI</span>
+        <span class="footer-badge">⚡ FastAPI Backend</span>
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div class="footer-links">
+      <h4>Hỗ trợ</h4>
+      <ul>
+        <li><a href="#">Chính sách bảo hành</a></li>
+        <li><a href="#">Chính sách đổi trả</a></li>
+        <li><a href="#">Hướng dẫn mua hàng</a></li>
+        <li><a href="#">Câu hỏi thường gặp</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-links">
+      <h4>Liên hệ</h4>
+      <ul>
+        <li>📍 TP. Hồ Chí Minh, Việt Nam</li>
+        <li>📞 0947119721 (Miễn phí)</li>
+        <li>✉️ support@shopg1.vn</li>
+        <li>🕐 8:00 - 22:00 mỗi ngày</li>
+      </ul>
+    </div>
+
+    <div class="footer-links">
+      <h4>Thanh toán</h4>
+      <div class="payment-icons">
+        <span class="pay-icon">💳 Visa</span>
+        <span class="pay-icon">🏦 ATM</span>
+        <span class="pay-icon">📱 Momo</span>
+        <span class="pay-icon">💰 COD</span>
+        <span class="pay-icon">🔵 VNPay</span>
+        <span class="pay-icon">🟢 ZaloPay</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Divider -->
+  <div class="footer-divider"></div>
+
+  <!-- Copyright bar -->
+  <div class="footer-bottom">
+    <div class="footer-copyright">
+      © 2026 <strong>ShopG1</strong>. Tất cả quyền được bảo lưu.
+    </div>
+    <div class="footer-legal">
+      <a href="#">Điều khoản sử dụng</a>
+      <span>·</span>
+      <a href="#">Chính sách bảo mật</a>
+      <span>·</span>
+      <a href="#">Sitemap</a>
+    </div>
+    <div class="footer-made">
+      Made with ❤️ in Vietnam
+    </div>
+  </div>
+</footer>
 <script>
   // ===== CONFIG =====
   const API_BASE = 'https://ecommerce-chatbot-kmt1.onrender.com'; //'http://localhost:8000';
@@ -1230,14 +1448,14 @@
 
   function showWelcome() {
     appendMessage(
-      `👋 Xin chào! Tôi là <b>ShopBot AI</b> - trợ lý mua sắm thông minh.<br><br>
-       Tôi có thể giúp bạn:<br>
+      `👋 Xin chào! Em là <b>Jarvis AI</b> - trợ lý mua sắm thông minh.<br><br>
+       Em ở đây để hỗ trợ mình ạ:<br>
        🔍 <b>Tìm sản phẩm</b> theo nhu cầu<br>
        🛒 <b>Đặt hàng</b> ngay trong chat<br>
        📦 <b>Theo dõi đơn hàng</b> real-time<br>
        ❓ <b>Giải đáp</b> chính sách, bảo hành<br><br>
-       Bạn cần tôi hỗ trợ gì hôm nay?`,
-      'bot'
+       Anh/Chị cần em hỗ trợ gì hôm nay?`,
+      'Jarvis'
     );
   }
 
