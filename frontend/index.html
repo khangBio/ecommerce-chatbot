@@ -1338,7 +1338,7 @@
     const data = await callChatAPI(text);
     removeTyping();
     conversationId = data.conversation_id || conversationId;
-    appendMessage(data.response || data.message || 'Tôi có thể giúp gì cho bạn?', 'bot');
+    appendMessage(data.response || data.message || data.bot_message || 'Tôi có thể giúp gì cho bạn?', 'bot');
   }
 
   async function handleSearch(text) {
