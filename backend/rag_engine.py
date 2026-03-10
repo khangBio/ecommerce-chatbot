@@ -90,11 +90,23 @@ class RAGEngine:
         
         try:
             response = self.model.generate_content(prompt)
-            result = json.loads(response.text)
+            
+            # DÙNG REGEX: Tìm đoạn text bắt đầu bằng { và kết thúc bằng }
+            match = re.search(r'\{.*\}', response.text, re.DOTALL)
+            
+            if match:
+                clean_json = match.group(0)
+                result = json.loads(clean_json)
+            else:
+                # Nếu không tìm thấy JSON, fallback về general_inquiry
+                print(f"⚠️ Gemini trả về format không chuẩn: {response.text}")
+                result = {"intent": "general_inquiry", "entities": {}}
+                
         except Exception as e:
-            print(f"Intent error: {e}")
+            # In lỗi ra Terminal để bạn dễ debug
+            print(f"❌ Intent Error: {e} | Text: {response.text}")
             result = {"intent": "general_inquiry", "entities": {}}
-        
+            
         return result
     
     def generate_response(self, query: str, conversation_id: str = None) -> str:
@@ -105,19 +117,23 @@ class RAGEngine:
                 docs = self.vectorstore.similarity_search(query, k=3)
                 context = "\n".join([d.page_content for d in docs])
             
-            prompt = f"""Bạn là trợ lý ảo thương mại chuyên nghiệp.
+            # CẬP NHẬT LẠI PROMPT SIÊU NGHIÊM NGẶT CHO BOT
+            prompt = f"""Bạn là trợ lý ảo thương mại chuyên nghiệp tên là ShopG1.
             
-            Kiến thức có sẵn:
+            DỮ LIỆU CỬA HÀNG ĐANG CÓ (Rất quan trọng):
             {context}
             
-            Câu hỏi khách hàng: {query}
+            Câu hỏi của khách hàng: "{query}"
             
-            Hãy trả lời ngắn gọn, hữu ích và thân thiện bằng tiếng Việt.
+            QUY TẮC BẮT BUỘC PHẢI TUÂN THỦ:
+            1. KIỂM CHỨNG SẢN PHẨM: Nếu khách hỏi một sản phẩm KHÔNG CÓ TÊN CHÍNH XÁC trong "Dữ liệu cửa hàng đang có" (Ví dụ: Khách hỏi iPhone 18, nhưng dữ liệu chỉ có iPhone 15), bạn PHẢI TỪ CHỐI KHÉO LÉO (báo cửa hàng chưa có hoặc chưa ra mắt), sau đó mới được phép gợi ý các sản phẩm có sẵn tương tự. TUYỆT ĐỐI KHÔNG nhận vơ sản phẩm có sẵn là sản phẩm khách đang tìm.
+            2. HƯỚNG DẪN ĐẶT HÀNG: Nếu khách hỏi "giúp tôi đặt hàng", "làm sao để mua", hãy hướng dẫn họ: "Bạn vui lòng tìm kiếm sản phẩm muốn mua, sau đó bấm vào nút 'Mua ngay' bên dưới thẻ sản phẩm để tôi tạo đơn hàng cho bạn nhé!".
+            3. Trả lời ngắn gọn, lịch sự, xưng hô "tôi" và "bạn".
             """
             
             response = self.model.generate_content(prompt)
             return response.text
             
         except Exception as e:
-            print(f"Error: {e}")
-            return "Xin lỗi, tôi gặp vấn đề kỹ thuật."
+            print(f"Generate response error: {e}")
+            return "Xin lỗi, hiện tại tôi đang quá tải. Bạn vui lòng thử lại sau giây lát nhé."

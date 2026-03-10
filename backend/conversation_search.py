@@ -177,6 +177,20 @@ class ConversationalSearch:
     
     def _generate_search_response(self, products: list, query: str, context: dict) -> str:
         """Generate natural language response"""
+        # Format lại danh sách sản phẩm để bot dễ đọc
+        product_info = "\n".join([f"- {p['name']}: {p['price']}đ" for p in products]) if products else "Không tìm thấy sản phẩm nào khớp."
+        
+        prompt = f"""Bạn là ShopG1 - trợ lý tư vấn bán hàng chuyên nghiệp.
+        Khách hàng đang yêu cầu: "{query}"
+        
+        DỮ LIỆU CỬA HÀNG ĐANG CÓ (Chỉ được phép bán những món này):
+        {product_info}
+        
+        QUY TẮC CỰC KỲ NGHIÊM NGẶT:
+        1. KIỂM TRA TÊN SẢN PHẨM: So sánh tên sản phẩm khách hỏi với "Dữ liệu cửa hàng". Nếu khách hỏi model đời cao (VD: iPhone 18) mà cửa hàng chỉ có đời thấp hơn (VD: iPhone 15), bạn BẮT BUỘC phải nói: "Xin lỗi, hiện tại cửa hàng chưa có [Tên sản phẩm khách hỏi]". 
+        2. TƯ VẤN CHUYỂN HƯỚNG: Sau khi từ chối, mới được phép gợi ý: "Tuy nhiên, cửa hàng đang có sẵn [Tên sản phẩm trong dữ liệu] rất đáng để bạn tham khảo...".
+        3. KHÔNG ĐƯỢC nhận vơ sản phẩm của cửa hàng là sản phẩm khách đang tìm.
+        """
         if not products:
             return "Xin lỗi, tôi không tìm thấy sản phẩm phù hợp. Bạn có thể mô tả cụ thể hơn không?"
         
