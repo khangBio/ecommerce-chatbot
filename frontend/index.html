@@ -523,6 +523,42 @@
       margin-top: 6px;
     }
 
+    /* ===== NÚT MICRO ===== */
+    .mic-btn {
+      width: 42px;
+      height: 42px;
+      background: #f8f9fa;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .mic-btn:hover {
+      background: #e8f0fe;
+      border-color: #1a73e8;
+    }
+
+    /* Hiệu ứng khi đang thu âm */
+    .mic-btn.recording {
+      background: #ffebee;
+      border-color: #ea4335;
+      color: transparent;
+      text-shadow: 0 0 0 #ea4335; /* Đổi màu icon sang đỏ */
+      animation: pulse-red 1.5s infinite;
+    }
+
+    @keyframes pulse-red {
+      0% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(234, 67, 53, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0); }
+    }
+
     /* ===== FLOATING CHAT BUTTON ===== */
     .chat-fab {
       position: fixed;
@@ -642,12 +678,12 @@
     .history-order-body p { font-size: 13px; color: #555; margin-bottom: 5px; }
 
      /* ===== FOOTER ===== */
-  .footer {
-    background: #1a1a2e;
-    color: #ccc;
-    margin-top: 60px;
-    padding: 48px 32px 0;
-  }
+    .footer {
+      background: #1a1a2e;
+      color: #ccc;
+      margin-top: 60px;
+      padding: 48px 32px 0;
+    }
 
   .footer-content {
     max-width: 1200px;
@@ -904,6 +940,8 @@
       <!-- Input -->
       <div class="chat-input-area">
         <div class="input-row">
+          <button class="mic-btn" id="micBtn" onclick="toggleVoice()" title="Nhập bằng giọng nói">🎤</button>
+          
           <textarea
             id="chatInput"
             class="chat-input"
@@ -1609,6 +1647,65 @@
       closeOrderModal();
     }
   });
+
+  // ===== TÍNH NĂNG NHẬN DIỆN GIỌNG NÓI (VOICE TO TEXT) =====
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  let isRecordingVoice = false;
+
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false; // Dừng lại khi người dùng ngừng nói
+    recognition.lang = 'vi-VN';     // Set ngôn ngữ nhận diện là tiếng Việt
+    recognition.interimResults = false;
+
+    // Khi bắt đầu nghe
+    recognition.onstart = function() {
+      isRecordingVoice = true;
+      document.getElementById('micBtn').classList.add('recording');
+      document.getElementById('chatInput').placeholder = "Đang lắng nghe bạn nói...";
+    };
+
+    // Khi nhận diện thành công chữ
+    recognition.onresult = function(event) {
+      const transcript = event.results[0][0].transcript;
+      const input = document.getElementById('chatInput');
+      
+      // Nối chữ vừa nói vào ô input và tự động căn chỉnh chiều cao
+      input.value += (input.value ? ' ' : '') + transcript;
+      autoResize(input);
+      
+      // Tùy chọn: Gửi luôn tin nhắn sau khi nói xong bằng cách bỏ comment dòng dưới
+      sendMessage(); 
+    };
+
+    // Khi có lỗi (thường do chưa cấp quyền Micro)
+    recognition.onerror = function(event) {
+      console.error("Lỗi Micro: ", event.error);
+      showToast("Lỗi Micro", "Không thể thu âm. Hãy cấp quyền Micro cho trình duyệt nhé!");
+    };
+
+    // Khi kết thúc nghe
+    recognition.onend = function() {
+      isRecordingVoice = false;
+      document.getElementById('micBtn').classList.remove('recording');
+      document.getElementById('chatInput').placeholder = "Nhập tin nhắn... (Enter để gửi)";
+    };
+  }
+
+  // Hàm được gọi khi bấm nút Micro
+  function toggleVoice() {
+    if (!recognition) {
+      alert("Trình duyệt của bạn không hỗ trợ nhận diện giọng nói. Vui lòng dùng Google Chrome hoặc Microsoft Edge.");
+      return;
+    }
+
+    if (isRecordingVoice) {
+      recognition.stop();
+    } else {
+      recognition.start();
+    }
+  }
 
   init();
 </script>
