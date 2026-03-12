@@ -24,6 +24,13 @@ class RecommendationEngine:
         # Lấy danh sách sản phẩm trực tiếp từ DB
         products = self.product_model.get_all_products(limit=100)
 
+        # Normalize budget: nếu Gemini trả về 20 thay vì 20_000_000
+        if "budget" in preferences and preferences["budget"] < 1000:
+            preferences["budget"] = preferences["budget"] * 1_000_000
+
+        # Fallback: nếu không có budget, không gợi ý sản phẩm giá quá cao
+        max_price_fallback = preferences.get("budget", float("inf"))
+
         # Extract preferences from conversation
         budget = preferences.get("budget")
         category = preferences.get("category")
@@ -56,14 +63,12 @@ class RecommendationEngine:
         
         # Budget matching
         if "budget" in preferences:
-            budget = preferences["budget"]
-            if product["price"] <= budget:
-                score += 5.0
-                # Bonus for value-for-money
-                if product["price"] < budget * 0.8:
-                    score += 2.0
-            else:
-                return 0  # Out of budget
+            if product["price"] > preferences["budget"]:
+                return 0  # Loại bỏ vượt ngân sách
+            score += 5.0    
+            
+            if product["price"] < preferences["budget"] * 0.8:
+            score += 2.0
         
         # Category matching
         if "category" in preferences:

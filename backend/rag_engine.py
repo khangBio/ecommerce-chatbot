@@ -85,6 +85,11 @@ class RAGEngine:
         
         Tin nhắn: "{message}"
         
+        Lưu ý quan trọng khi extract entities:
+        - "budget" phải là số nguyên đơn vị VNĐ
+        (vd: "20 triệu" → 20000000, "1.5 triệu" → 1500000)
+        - "category" là một trong: Điện thoại, Laptop, Tai nghe, Máy tính bảng
+        
         Trả về JSON format: {{"intent": "...", "entities": {{}}}}
         """
         
