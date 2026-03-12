@@ -66,9 +66,9 @@ class RecommendationEngine:
             if product["price"] > preferences["budget"]:
                 return 0  # Loại bỏ vượt ngân sách
             score += 5.0    
-            
+
             if product["price"] < preferences["budget"] * 0.8:
-            score += 2.0
+                score += 2.0
         
         # Category matching
         if "category" in preferences:
