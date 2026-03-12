@@ -15,6 +15,17 @@ class RecommendationEngine:
         self.product_model = ProductModel()
         self.product_model.connect()
         self.user_profiles = {}
+
+    def _normalize_budget(self, budget) -> float:
+        """Chuẩn hóa budget về đơn vị VNĐ"""
+        if not budget:
+            return None
+        budget = float(budget)
+        if budget < 1_000:          # vd: 20 → 20_000_000
+            return budget * 1_000_000
+        elif budget < 1_000_000:    # vd: 20_000 → 20_000_000
+            return budget * 1_000
+        return budget               # đã đúng dạng VNĐ    
     
     def get_recommendations(self, user_id: str, preferences: dict, 
                           conversation_history: dict = None) -> dict:
@@ -25,8 +36,8 @@ class RecommendationEngine:
         products = self.product_model.get_all_products(limit=100)
 
         # Normalize budget: nếu Gemini trả về 20 thay vì 20_000_000
-        if "budget" in preferences and preferences["budget"] < 1000:
-            preferences["budget"] = preferences["budget"] * 1_000_000
+        if "budget" in preferences and preferences["budget"]:
+            preferences["budget"] = self._normalize_budget(preferences["budget"])
 
         # Fallback: nếu không có budget, không gợi ý sản phẩm giá quá cao
         max_price_fallback = preferences.get("budget", float("inf"))
@@ -64,7 +75,7 @@ class RecommendationEngine:
         # Budget matching
         if "budget" in preferences:
             if product["price"] > preferences["budget"]:
-                return 0  # Loại bỏ vượt ngân sách
+                return -1  # Loại bỏ vượt ngân sách
             score += 5.0    
 
             if product["price"] < preferences["budget"] * 0.8:

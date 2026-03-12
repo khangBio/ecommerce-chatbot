@@ -84,7 +84,7 @@ class RAGEngine:
           return_request, technical_support, general_inquiry
         
         Tin nhắn: "{message}"
-        
+
         Lưu ý quan trọng khi extract entities:
         - "budget" phải là số nguyên đơn vị VNĐ
         (vd: "20 triệu" → 20000000, "1.5 triệu" → 1500000)
@@ -95,7 +95,14 @@ class RAGEngine:
         
         try:
             response = self.model.generate_content(prompt)
-            result = json.loads(response.text)
+            raw = response.text.strip()
+        
+            #FIX: Strip markdown code block nếu Gemini bọc JSON
+            if raw.startswith("```"):
+                raw = re.sub(r"^```(?:json)?\s*", "", raw)
+                raw = re.sub(r"\s*```$", "", raw.strip())
+
+            result = json.loads(response.raw)
         except Exception as e:
             print(f"Intent error: {e}")
             result = {"intent": "general_inquiry", "entities": {}}
