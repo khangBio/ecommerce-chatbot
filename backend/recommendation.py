@@ -23,7 +23,7 @@ class RecommendationEngine:
         budget = float(budget)
         if budget < 1_000:          # vd: 20 → 20_000_000
             return budget * 1_000_000
-        elif budget < 1_000_000:    # vd: 20_000 → 20_000_000
+        elif budget < 100_000:    # vd: 20_000 → 20_000_000
             return budget * 1_000
         return budget               # đã đúng dạng VNĐ    
     
@@ -41,6 +41,9 @@ class RecommendationEngine:
 
         # Fallback: nếu không có budget, không gợi ý sản phẩm giá quá cao
         max_price_fallback = preferences.get("budget", float("inf"))
+        # Nếu không có budget, áp dụng giới hạn giá mặc định
+        if "budget" not in preferences:
+            preferences["budget"] = max_price_fallback  # Dùng thực sự
 
         # Extract preferences from conversation
         budget = preferences.get("budget")
@@ -51,7 +54,7 @@ class RecommendationEngine:
         candidates = []
         for product in products: 
             score = self._calculate_score(product, preferences)
-            if score > 0:
+            if score >= 0:
                 candidates.append({**product, "score": score})
         
         # Sort by score
@@ -108,6 +111,18 @@ class RecommendationEngine:
     
     def _generate_reasoning(self, product: dict, preferences: dict) -> str:
         """Generate explanation for recommendation"""
+        if not product:
+            return "Không tìm thấy sản phẩm phù hợp với yêu cầu của bạn."
+
+        budget_display = preferences.get("budget")
+        #[CHỈNH SỬA] Hiển thị budget dạng có dấu phẩy, bỏ "inf" khó đọc
+        # Bản cũ: in thẳng số float, vd: "1e+18" hoặc "inf"
+        # Bản mới: format đẹp hoặc fallback sang "của bạn"
+        if budget_display and budget_display != float("inf"):
+            budget_str = f"{int(budget_display):,}đ"
+        else:
+            budget_str = "của bạn"
+
         reasoning = f"Tôi gợi ý {product['name']} vì:\n"
         reasoning += f"- Phù hợp với ngân sách {preferences.get('budget', 'của bạn')}\n"
         reasoning += f"- Thuộc danh mục {product['category']}\n"
