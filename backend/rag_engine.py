@@ -102,7 +102,7 @@ class RAGEngine:
                 raw = re.sub(r"^```(?:json)?\s*", "", raw)
                 raw = re.sub(r"\s*```$", "", raw.strip())
 
-            result = json.loads(response.raw)
+            result = json.loads(raw)
         except Exception as e:
             print(f"Intent error: {e}")
             result = {"intent": "general_inquiry", "entities": {}}
