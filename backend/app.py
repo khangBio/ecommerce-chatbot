@@ -106,10 +106,18 @@ async def chat(request: ChatRequest):
         # 2. Xử lý theo intent
         if intent == "product_search":
             # Tính năng: Conversational Search
+            filters = {}
+            if entities.get("category"):
+                filters["category"] = entities["category"]
+            if entities.get("budget"):
+                filters["price_max"] = entities["budget"]
+            if entities.get("price_min"):
+                filters["price_min"] = entities["price_min"]
+
             search_result = conversation_search.search(
                 query=request.message,
                 conversation_id=request.conversation_id,
-                entities=entities
+                filters=filters if filters else None 
             )
             products = search_result["products"]
             bot_message = search_result["response"]

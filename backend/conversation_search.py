@@ -76,6 +76,13 @@ class ConversationalSearch:
         """
         Tìm kiếm sản phẩm với context retention và MongoDB validation
         """
+        # ✅ Thêm guard clause này vào đầu hàm
+        if self.product_vectorstore is None:
+            return {
+                "products": [],
+                "response": "⚠️ Hệ thống chưa có dữ liệu sản phẩm. Vui lòng liên hệ admin.",
+                "query": query
+            }
         # Get conversation context
         context = self.get_context(conversation_id) if conversation_id else {}
         enhanced_query = self._enhance_query(query, context)
