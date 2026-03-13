@@ -84,24 +84,25 @@ class RAGEngine:
           return_request, technical_support, general_inquiry
         
         Tin nhắn: "{message}"
+
+        Lưu ý quan trọng khi extract entities:
+        - "budget" phải là số nguyên đơn vị VNĐ
+        (vd: "20 triệu" → 20000000, "1.5 triệu" → 1500000)
+        - "category" là một trong: Điện thoại, Laptop, Tai nghe, Máy tính bảng
         
         Trả về JSON format: {{"intent": "...", "entities": {{}}}}
         """
         
         try:
             response = self.model.generate_content(prompt)
-            
-            # DÙNG REGEX: Tìm đoạn text bắt đầu bằng { và kết thúc bằng }
-            match = re.search(r'\{.*\}', response.text, re.DOTALL)
-            
-            if match:
-                clean_json = match.group(0)
-                result = json.loads(clean_json)
-            else:
-                # Nếu không tìm thấy JSON, fallback về general_inquiry
-                print(f"⚠️ Gemini trả về format không chuẩn: {response.text}")
-                result = {"intent": "general_inquiry", "entities": {}}
-                
+            raw = response.text.strip()
+        
+            #FIX: Strip markdown code block nếu Gemini bọc JSON
+            if raw.startswith("```"):
+                raw = re.sub(r"^```(?:json)?\s*", "", raw)
+                raw = re.sub(r"\s*```$", "", raw.strip())
+
+            result = json.loads(raw)
         except Exception as e:
             # In lỗi ra Terminal để bạn dễ debug
             print(f"❌ Intent Error: {e} | Text: {response.text}")

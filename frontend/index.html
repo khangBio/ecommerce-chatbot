@@ -1539,8 +1539,7 @@
   }
 
   // ===== INIT =====
-  renderProducts();
-  showWelcome();
+  init();
   async function init() {
     await renderProducts(); // Chờ load products
     await loadChatHistory();
@@ -1706,8 +1705,6 @@
       recognition.start();
     }
   }
-
-  init();
 </script>
 
 </body>
